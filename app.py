@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import time
 import plotly.express as px  # Plotly for interactive maps and charts
+import plotly.graph_objects as go  # Plotly for custom graphs
+from datetime import datetime, timedelta
 from data_generator import NetworkTrafficGenerator
 from weather import WeatherFetcher
 
@@ -31,6 +33,14 @@ if 'traffic_generator' not in st.session_state:
 # Initialize weather fetcher
 if 'weather_fetcher' not in st.session_state:
     st.session_state.weather_fetcher = WeatherFetcher()
+
+# Initialize traffic history for 30-minute graph
+if 'traffic_history' not in st.session_state:
+    st.session_state.traffic_history = {
+        'timestamps': [],
+        'download_speeds': [],
+        'upload_speeds': []
+    }
 
 # ============================================================================
 # STEP 3: SIDEBAR CONTROLS
@@ -140,6 +150,25 @@ total_download = df['Download (MB)'].sum()
 # Sum all upload traffic across all devices
 total_upload = df['Upload (MB)'].sum()
 
+# COLLECT CURRENT SPEEDS FOR HISTORY GRAPH
+# Sum current speeds from all devices
+current_download_speed = df['current_download_speed'].sum()
+current_upload_speed = df['current_upload_speed'].sum()
+
+# Add to history with timestamp
+current_time = datetime.now()
+st.session_state.traffic_history['timestamps'].append(current_time)
+st.session_state.traffic_history['download_speeds'].append(current_download_speed)
+st.session_state.traffic_history['upload_speeds'].append(current_upload_speed)
+
+# Keep only last 30 minutes of data
+cutoff_time = current_time - timedelta(minutes=30)
+# Filter out data older than 30 minutes
+valid_indices = [i for i, t in enumerate(st.session_state.traffic_history['timestamps']) if t >= cutoff_time]
+st.session_state.traffic_history['timestamps'] = [st.session_state.traffic_history['timestamps'][i] for i in valid_indices]
+st.session_state.traffic_history['download_speeds'] = [st.session_state.traffic_history['download_speeds'][i] for i in valid_indices]
+st.session_state.traffic_history['upload_speeds'] = [st.session_state.traffic_history['upload_speeds'][i] for i in valid_indices]
+
 # ============================================================================
 # STEP 7: DISPLAY METRICS (TOP ROW)
 # ============================================================================
@@ -151,6 +180,59 @@ col1, col2, col3 = st.columns(3)
 col1.metric("Connected Devices", total_devices)
 col2.metric("Total Download", f"{total_download:.2f} MB")
 col3.metric("Total Upload", f"{total_upload:.2f} MB")
+
+# ============================================================================
+# STEP 7.5: NETWORK SPEED GRAPH (30-MINUTE HISTORY)
+# ============================================================================
+st.markdown("### Network Throughput (Last 30 Minutes)")
+
+# Only show graph if we have enough data points
+if len(st.session_state.traffic_history['timestamps']) > 0:
+    # Create Plotly figure with two lines (Download and Upload)
+    fig_speed = go.Figure()
+
+    # Add Download speed line (blue)
+    fig_speed.add_trace(go.Scatter(
+        x=st.session_state.traffic_history['timestamps'],
+        y=st.session_state.traffic_history['download_speeds'],
+        mode='lines',
+        name='Download',
+        line=dict(color='#3b82f6', width=2),
+        fill='tozeroy',
+        fillcolor='rgba(59, 130, 246, 0.1)'
+    ))
+
+    # Add Upload speed line (green)
+    fig_speed.add_trace(go.Scatter(
+        x=st.session_state.traffic_history['timestamps'],
+        y=st.session_state.traffic_history['upload_speeds'],
+        mode='lines',
+        name='Upload',
+        line=dict(color='#10b981', width=2),
+        fill='tozeroy',
+        fillcolor='rgba(16, 185, 129, 0.1)'
+    ))
+
+    # Update layout
+    fig_speed.update_layout(
+        xaxis_title="Time",
+        yaxis_title="Speed (MB/s)",
+        hovermode='x unified',
+        height=400,
+        margin=dict(l=0, r=0, t=0, b=0),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        )
+    )
+
+    # Display the graph
+    st.plotly_chart(fig_speed, use_container_width=True)
+else:
+    st.info("Collecting data... Graph will appear after a few updates.")
 
 # ============================================================================
 # STEP 8: GLOBAL TRAFFIC MAP (PLOTLY)

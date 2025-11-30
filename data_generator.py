@@ -124,18 +124,31 @@ class NetworkTrafficGenerator:
                 if device["type"] == "Router":
                     added_upload = random.randint(1000, 5000000)
                     added_download = random.randint(5000, 10000000)
+                    # Router has higher throughput speeds
+                    device["current_upload_speed"] = random.uniform(0.5, 10.0)  # MB/s
+                    device["current_download_speed"] = random.uniform(2.0, 50.0)  # MB/s
                 elif device["type"] == "Printer":
                     added_upload = random.randint(0, 1000)
                     added_download = random.randint(0, 1000)
+                    # Printer has minimal speeds
+                    device["current_upload_speed"] = random.uniform(0.0, 0.5)  # MB/s
+                    device["current_download_speed"] = random.uniform(0.0, 0.5)  # MB/s
                 else:
                     added_upload = random.randint(100, 1000000)
                     added_download = random.randint(500, 5000000)
+                    # Other devices (desktops, mobile) have moderate speeds
+                    device["current_upload_speed"] = random.uniform(0.1, 5.0)  # MB/s
+                    device["current_download_speed"] = random.uniform(0.5, 25.0)  # MB/s
 
                 device["upload_bytes"] += added_upload
                 device["download_bytes"] += added_download
 
                 # Update timestamp while active
                 device["last_seen"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                # Offline devices have 0 speed
+                device["current_upload_speed"] = 0.0
+                device["current_download_speed"] = 0.0
 
     def get_devices(self):
         """
