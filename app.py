@@ -61,3 +61,32 @@ st.markdown("Live map of external servers communicating with your network.")
 # Get connection data from generator
 connections = st.session_state.traffic_generator.generate_external_connections()
 map_df = pd.DataFrame(connections)
+
+# Display the map
+st.map(map_df)
+
+# Step 9: Display Data Table
+st.subheader("Device Details")
+# Select and rename columns for the view
+display_df = df[['name', 'type', 'ip', 'status', 'Download (MB)', 'Upload (MB)', 'last_seen', 'mac']]
+
+st.dataframe(
+    display_df,
+    width='stretch',
+    column_config={
+        "name": "Device Name",
+        "type": "Type",
+        "ip": "IP Address",
+        "status": "Status",
+        "Download (MB)": st.column_config.NumberColumn("Download (MB)", format="%.2f MB"),
+        "Upload (MB)": st.column_config.NumberColumn("Upload (MB)", format="%.2f MB"),
+        "last_seen": "Last Connected",
+        "mac": "MAC Address"
+    }
+)
+
+# Step 10: Auto-Refresh Logic
+# If the checkbox is checked, we wait for the specified time and then rerun the script.
+if auto_refresh:
+    time.sleep(refresh_rate)
+    st.rerun()
