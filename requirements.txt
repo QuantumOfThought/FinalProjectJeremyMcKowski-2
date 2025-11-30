@@ -2,3 +2,9 @@ streamlit
 faker
 pandas
 watchdog
+plotly
+requests
+folium
+streamlit-folium
+numpy
+pytz
