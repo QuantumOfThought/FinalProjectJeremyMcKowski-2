@@ -131,6 +131,12 @@ auto_refresh = st.sidebar.checkbox("Enable Live Updates", value=False)
 # Allows user to control how often the dashboard updates (1-10 seconds)
 refresh_rate = st.sidebar.slider("Refresh Rate (seconds)", 1, 10, 1)
 
+# DEVICE SELECTION DROPDOWN
+# Get device list for dropdown (need to fetch devices early)
+temp_devices = st.session_state.traffic_generator.get_devices()
+device_names = ["All Devices"] + [device['name'] for device in temp_devices]
+selected_device = st.sidebar.selectbox("Select Device", device_names, index=0)
+
 # Visual separator line in the sidebar
 st.sidebar.markdown("---")
 
