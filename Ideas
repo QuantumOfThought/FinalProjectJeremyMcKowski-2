@@ -1,0 +1,85 @@
+I want to do the following  i want to monior traffic to and from a Uqibquiti Dream Machine router
+I cant do a real api so I want faker to be used to generate the fake traffic
+
+this will be a streamlit app 
+
+here was my original idea
+The Concept of What I am Doing and the Need
+
+• Home networks now contain numerous IoT devices that communicate with external 
+servers without user visibility. After viewing Ubiquiti's dashboard, is useful but 
+overly complex for what I want to accomplish. It can be a touch overwhelming and 
+broad in scope where I simply need a basic dashboard of devices connected to the 
+network and a simple overview of the type of traffic and how much each device is
+sending or receiving for basic security awareness. This project creates a simplified 
+monitoring dashboard that shows device connection patterns and transmit/receive 
+information in an easy-to-read format. 
+The API I Have Chosen and Why
+
+• The Ubiquiti Site Manager API provides access to network device data and traffic 
+metrics from my Dream Router 7. This API offers device connection tracking, traffic 
+flow analysis, and filtering by SSID, which aligns with project requirements. The 
+practical advantage is working with existing hardware that has a standard 
+dashboard I can work against to custom build a “better” dashboard. 
+• The API's JSON format and rate limiting support sustained monitoring applications.
+The Framework I Have Chosen and Why
+
+• After seeing the other frameworks in class, I assess that Streamlit provides the best 
+dashboard development with built-in data visualization components and real-time 
+data handling. Its foundational architecture ensures seems like a simple way to 
+build a webapp that is lightweight, but able to display the information in a 
+selectable manner. After seeing the class example, it feels like a better lighter 
+weight choice and has some niceties built in like the mapping integration 
+capabilities enable geographic analysis and visualization of external IP destinations, 
+accessible drop-down menus, selection boxes, and real time response to ongoing 
+information feels like the best fit. I also honestly liked how it looked in class. 
+Project Plan
+
+• Phase One: Establish API connectivity and basic device discovery. 
+• Phase Two: Develop connection tracking and CSV logging for historical analysis. 
+• Phase Three: Build the Streamlit dashboard with simplified device displays and 
+connection visualizations. 
+• Phase Four: Add geographic mapping of external destinations and protocol analysis. 
+• Phase Five: Implement alerting for suspicious behavior, testing, and 
+documentation.
+
+I want to add accuweather as a widget as well I have an API key we can use later but for now review and lets get faker started for the traffic -- comment everything in steps so I can follow along 
+
+https://www.youtube.com/watch?v=92rDEjkN7Ck
+https://faker.readthedocs.io/en/master/
+https://developer.accuweather.com/documentation/core-weather-quick-start
+https://pypi.org/project/watchdog/
+
+https://github.com/ajitagupta/streamlit-cybersecurity-dashboard
+https://github.com/VisionHub25/cloud-security-dashboard
+https://www.freecodecamp.org/news/build-a-real-time-network-traffic-dashboard-with-python-and-streamlit/#heading-future-enhancements
+
+
+https://faker.readthedocs.io/en/master/
+
+Weather
+Router Up Time
+Router Total Data Usage (Up and DOwnload) 
+Map
+Create custom alerts based on traffic analysis patterns
+**Add packet payload analysis options
+
+COnnected Devices
+ISP connection graphic
+
+Settings Option 
+
+Access Point Info 
+
+Shortcuts to SPeed Test 
+Topology
+and log out and log in ?
+
+Internet Activity Grah UP ; Down
+
+Connection Quality under AP
+
+Ethernet VS wired connection 
+
+Alert Window that shows a list of alerts, what deivce, what time, IP 
+
