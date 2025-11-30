@@ -9,17 +9,7 @@
 
 This web application is designed to display a live dashboard of a home network simulating a Ubiquiti router.
 
-### Key Features
-
-- **Real-time Network Metrics**: Track connected devices, total download/upload traffic, and device status
-- **30-Minute Throughput Graph**: Live interactive graph showing download and upload speeds over the last 30 minutes
-- **Global Traffic Map**: Visual representation of external connections on an interactive world map
-- **Security Alerts**: Suspicious traffic detection including port scans, risky geolocation connections, data exfiltration attempts, and unusual port access
-- **Weather Widget**: Real-time local weather conditions from AccuWeather API (Hays, KS)
-- **Device Details**: Comprehensive table showing all network devices with MAC addresses, IP addresses, connection types, and traffic statistics
-
 Due to router API limitations, this application uses Python Faker library to generate realistic simulated network traffic data for demonstration purposes of a Ubiquiti Router.
-
 
 ## Getting Started
 
