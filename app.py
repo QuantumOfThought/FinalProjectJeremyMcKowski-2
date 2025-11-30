@@ -3,6 +3,7 @@ import pandas as pd
 import time
 import plotly.express as px  # Plotly for interactive maps and charts
 from data_generator import NetworkTrafficGenerator
+from weather import WeatherFetcher
 
 # ============================================================================
 # STEP 1: PAGE CONFIGURATION
@@ -16,7 +17,7 @@ st.set_page_config(
 )
 
 # ============================================================================
-# STEP 2: INITIALIZE DATA GENERATOR
+# STEP 2: INITIALIZE DATA GENERATOR AND WEATHER FETCHER
 # ============================================================================
 # Streamlit reruns the entire script on every interaction (button click, slider move, etc.)
 # To preserve data between reruns, we use st.session_state
@@ -26,6 +27,10 @@ if 'traffic_generator' not in st.session_state:
     # Create a new instance of our NetworkTrafficGenerator class
     # This will only happen on the first run or after clearing cache
     st.session_state.traffic_generator = NetworkTrafficGenerator()
+
+# Initialize weather fetcher
+if 'weather_fetcher' not in st.session_state:
+    st.session_state.weather_fetcher = WeatherFetcher()
 
 # ============================================================================
 # STEP 3: SIDEBAR CONTROLS
@@ -59,11 +64,48 @@ st.sidebar.info(
 )
 
 # ============================================================================
-# STEP 4: DASHBOARD HEADER
+# STEP 4: DASHBOARD HEADER WITH WEATHER WIDGET
 # ============================================================================
-# Main title and subtitle for the dashboard
-st.title("📡 Ubiquiti Network Monitor")
-st.markdown("### Real-time Traffic Simulation")
+# Create a two-column layout for header with weather widget on the right
+header_left, header_right = st.columns([3, 1])
+
+# Left column: Main title and subtitle
+with header_left:
+    st.title("📡 Ubiquiti Network Monitor")
+    st.markdown("### Real-time Traffic Simulation")
+
+# Right column: Weather widget
+with header_right:
+    # Fetch current weather data
+    weather_data = st.session_state.weather_fetcher.get_current_weather()
+
+    if weather_data:
+        # Display weather widget with custom styling
+        st.markdown(
+            f"""
+            <div style='
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                padding: 20px;
+                border-radius: 15px;
+                text-align: center;
+                color: white;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                margin-top: 10px;
+            '>
+                <h3 style='margin: 0; font-size: 16px; font-weight: 500;'>📍 {weather_data['city']}</h3>
+                <h1 style='margin: 10px 0; font-size: 48px; font-weight: bold;'>{weather_data['temperature']}°{weather_data['unit']}</h1>
+                <p style='margin: 5px 0; font-size: 18px;'>{weather_data['weather_text']}</p>
+                <div style='margin-top: 10px; font-size: 14px; opacity: 0.9;'>
+                    <p style='margin: 2px 0;'>💧 Humidity: {weather_data['humidity']}%</p>
+                    <p style='margin: 2px 0;'>💨 Wind: {weather_data['wind_speed']} {weather_data['wind_unit']} {weather_data['wind_direction']}</p>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    else:
+        # Display error message if weather data couldn't be fetched
+        st.error("Unable to fetch weather data")
 
 # ============================================================================
 # STEP 5: FETCH CURRENT DEVICE DATA
