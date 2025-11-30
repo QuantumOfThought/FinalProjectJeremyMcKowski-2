@@ -47,3 +47,17 @@ df['Upload (MB)'] = df['upload_bytes'] / (1024 * 1024)
 total_devices = len(df[df['status'] == 'ONLINE'])
 total_download = df['Download (MB)'].sum()
 total_upload = df['Upload (MB)'].sum()
+
+# Step 7: Display Metrics
+col1, col2, col3 = st.columns(3)
+col1.metric("Connected Devices", total_devices)
+col2.metric("Total Download", f"{total_download:.2f} MB")
+col3.metric("Total Upload", f"{total_upload:.2f} MB")
+
+# Step 8: Visualizations (Map)
+st.markdown("### Global Traffic Origins")
+st.markdown("Live map of external servers communicating with your network.")
+
+# Get connection data from generator
+connections = st.session_state.traffic_generator.generate_external_connections()
+map_df = pd.DataFrame(connections)
