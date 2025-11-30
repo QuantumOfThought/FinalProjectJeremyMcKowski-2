@@ -26,3 +26,24 @@ st.sidebar.info(
     "This dashboard simulates network traffic using Faker. "
     "It monitors a Ubiquiti Dream Machine, a Desktop, and a Mobile device."
 )
+# Step 4: Dashboard Header
+st.title("📡 Ubiquiti Network Monitor")
+st.markdown("### Real-time Traffic Simulation")
+
+# Step 5: Get Data
+# Fetch the latest device data
+devices = st.session_state.traffic_generator.get_devices()
+
+# Step 6: Process Data (Convert to MB)
+# We convert the raw list of dicts into a DataFrame first for easier manipulation
+df = pd.DataFrame(devices)
+
+# Create new columns for MB for better readability
+df['Download (MB)'] = df['download_bytes'] / (1024 * 1024)
+df['Upload (MB)'] = df['upload_bytes'] / (1024 * 1024)
+
+# Calculate totals
+# Only count devices that are currently ONLINE
+total_devices = len(df[df['status'] == 'ONLINE'])
+total_download = df['Download (MB)'].sum()
+total_upload = df['Upload (MB)'].sum()
