@@ -42,6 +42,10 @@ if 'traffic_history' not in st.session_state:
         'upload_speeds': []
     }
 
+# Initialize security alerts storage
+if 'security_alerts' not in st.session_state:
+    st.session_state.security_alerts = []
+
 # ============================================================================
 # STEP 3: SIDEBAR CONTROLS
 # ============================================================================
@@ -169,6 +173,17 @@ st.session_state.traffic_history['timestamps'] = [st.session_state.traffic_histo
 st.session_state.traffic_history['download_speeds'] = [st.session_state.traffic_history['download_speeds'][i] for i in valid_indices]
 st.session_state.traffic_history['upload_speeds'] = [st.session_state.traffic_history['upload_speeds'][i] for i in valid_indices]
 
+# COLLECT SECURITY ALERTS
+# Generate new alerts (20% chance per refresh)
+new_alerts = st.session_state.traffic_generator.generate_security_alerts()
+
+# Add new alerts to the beginning of the list (most recent first)
+if new_alerts:
+    st.session_state.security_alerts = new_alerts + st.session_state.security_alerts
+
+# Keep only last 50 alerts
+st.session_state.security_alerts = st.session_state.security_alerts[:50]
+
 # ============================================================================
 # STEP 7: DISPLAY METRICS (TOP ROW)
 # ============================================================================
@@ -275,6 +290,58 @@ fig.update_traces(
 # DISPLAY THE MAP
 # use_container_width makes the map responsive to screen size
 st.plotly_chart(fig, use_container_width=True)
+
+# ============================================================================
+# STEP 8.5: SECURITY ALERTS TABLE
+# ============================================================================
+st.markdown("### 🚨 Suspicious Traffic Alerts")
+
+if st.session_state.security_alerts:
+    # Convert alerts to DataFrame for display
+    alerts_df = pd.DataFrame(st.session_state.security_alerts)
+
+    # Format timestamp for better readability
+    alerts_df['Time'] = alerts_df['timestamp'].dt.strftime('%Y-%m-%d %H:%M:%S')
+
+    # Select and rename columns for display
+    display_alerts = alerts_df[['Time', 'device', 'external_ip', 'reason', 'severity']]
+    display_alerts.columns = ['Time', 'Device', 'External IP', 'Alert Type', 'Severity']
+
+    # Apply color coding based on severity
+    def highlight_severity(row):
+        if row['Severity'] == 'High':
+            return ['background-color: #fee2e2; color: #991b1b'] * len(row)
+        elif row['Severity'] == 'Medium':
+            return ['background-color: #fef3c7; color: #92400e'] * len(row)
+        else:
+            return [''] * len(row)
+
+    # Display styled dataframe
+    styled_df = display_alerts.style.apply(highlight_severity, axis=1)
+
+    st.dataframe(
+        styled_df,
+        use_container_width=True,
+        column_config={
+            "Time": st.column_config.TextColumn("Time", width="medium"),
+            "Device": st.column_config.TextColumn("Device", width="medium"),
+            "External IP": st.column_config.TextColumn("External IP", width="medium"),
+            "Alert Type": st.column_config.TextColumn("Alert Type", width="large"),
+            "Severity": st.column_config.TextColumn("Severity", width="small")
+        },
+        hide_index=True
+    )
+
+    # Show alert summary
+    high_alerts = len([a for a in st.session_state.security_alerts if a['severity'] == 'High'])
+    medium_alerts = len([a for a in st.session_state.security_alerts if a['severity'] == 'Medium'])
+
+    col_alert1, col_alert2, col_alert3 = st.columns(3)
+    col_alert1.metric("Total Alerts", len(st.session_state.security_alerts))
+    col_alert2.metric("High Severity", high_alerts, delta=None, delta_color="inverse")
+    col_alert3.metric("Medium Severity", medium_alerts)
+else:
+    st.info("No suspicious traffic detected. Your network appears secure.")
 
 # ============================================================================
 # STEP 9: DEVICE DETAILS TABLE

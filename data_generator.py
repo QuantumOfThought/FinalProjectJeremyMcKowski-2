@@ -1,6 +1,6 @@
 import random
 from faker import Faker
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Step 1: Initialize Faker
 # We use Faker to generate realistic-looking data like MAC addresses and IPs.
@@ -198,3 +198,96 @@ class NetworkTrafficGenerator:
             })
 
         return connections
+
+    def generate_security_alerts(self):
+        """
+        Generates simulated suspicious traffic alerts.
+        Returns a list of alert dictionaries or empty list if no alerts this cycle.
+
+        Alert types:
+        - Port scans from risky IPs
+        - Connections to high-risk countries
+        - Data exfiltration (large uploads to unknown IPs)
+        - Unusual port access (SSH, database ports)
+        """
+        alerts = []
+
+        # 20% chance to generate an alert on each call
+        if random.random() > 0.2:
+            return alerts
+
+        # Randomly pick number of alerts (1-2)
+        num_alerts = random.randint(1, 2)
+
+        # Get list of online devices
+        online_devices = [d for d in self.devices if d['status'] == 'ONLINE']
+
+        if not online_devices:
+            return alerts
+
+        for _ in range(num_alerts):
+            # Pick a random online device
+            device = random.choice(online_devices)
+
+            # Determine alert type
+            alert_type = random.choice([
+                'port_scan',
+                'risky_geo',
+                'data_exfiltration',
+                'unusual_port'
+            ])
+
+            # Generate external IP based on alert type
+            if alert_type == 'risky_geo':
+                # Generate IP from risky countries
+                country = random.choice(['China', 'Russia', 'North Korea', 'Iran'])
+                external_ip = fake.ipv4_public()
+                reason = f"Connection from {country}"
+                severity = "High"
+
+            elif alert_type == 'port_scan':
+                # Port scanning activity
+                external_ip = fake.ipv4_public()
+                ports = random.choice([
+                    "22, 23, 80, 443, 3389",
+                    "21, 22, 3306, 5432",
+                    "135, 139, 445, 3389"
+                ])
+                reason = f"Port scan detected (ports: {ports})"
+                severity = "Medium"
+
+            elif alert_type == 'data_exfiltration':
+                # Large data upload
+                external_ip = fake.ipv4_public()
+                data_size = random.randint(500, 2000)
+                reason = f"Large upload detected ({data_size} MB to unknown IP)"
+                severity = "High"
+
+            else:  # unusual_port
+                # Unusual port access
+                external_ip = fake.ipv4_public()
+                port = random.choice([22, 23, 3389, 3306, 5432, 27017, 6379])
+                port_name = {
+                    22: "SSH",
+                    23: "Telnet",
+                    3389: "RDP",
+                    3306: "MySQL",
+                    5432: "PostgreSQL",
+                    27017: "MongoDB",
+                    6379: "Redis"
+                }
+                reason = f"Unexpected {port_name.get(port, 'service')} connection (port {port})"
+                severity = "Medium"
+
+            # Create alert dictionary
+            alert = {
+                'timestamp': datetime.now(),
+                'device': device['name'],
+                'external_ip': external_ip,
+                'reason': reason,
+                'severity': severity
+            }
+
+            alerts.append(alert)
+
+        return alerts
