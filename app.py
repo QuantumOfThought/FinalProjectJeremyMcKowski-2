@@ -57,6 +57,15 @@ st.markdown("""
         *, *::before, *::after {
             transition: none !important;
             animation: none !important;
+            transition-duration: 0s !important;
+            animation-duration: 0s !important;
+        }
+
+        /* Force immediate rendering - no fades */
+        html, body, #root, .stApp, .main, .block-container {
+            transition: none !important;
+            animation: none !important;
+            opacity: 1 !important;
         }
 
         /* Specifically target Streamlit elements */
@@ -68,18 +77,28 @@ st.markdown("""
         div[data-testid="stVerticalBlock"],
         div[data-testid="stHorizontalBlock"],
         div[data-testid="column"],
-        .main,
-        .block-container,
-        .stApp {
+        section[data-testid="stSidebar"],
+        .stSelectbox,
+        .stSlider,
+        .stCheckbox {
             transition: none !important;
             animation: none !important;
             animation-duration: 0s !important;
             animation-delay: 0s !important;
+            transition-delay: 0s !important;
+            opacity: 1 !important;
         }
 
         /* Disable skeleton loading animations */
         .stSkeleton {
             display: none !important;
+        }
+
+        /* Prevent fade effects on script reruns */
+        [data-testid="stAppViewContainer"] {
+            transition: none !important;
+            animation: none !important;
+            opacity: 1 !important;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -88,9 +107,9 @@ st.markdown("""
 # STEP 2: INITIALIZE DATA GENERATOR AND WEATHER FETCHER
 # ============================================================================
 # Streamlit reruns the entire script on every interaction (button click, slider move, etc.)
-# To preserve data between reruns, we use st.session_state
+# To preserve data between reruns, use st.session_state
 # This is like a dictionary that persists across reruns
-# We check if 'traffic_generator' already exists; if not, create it ONCE
+# Check if 'traffic_generator' already exists; if not, create it ONCE
 if 'traffic_generator' not in st.session_state:
     # Create a new instance of our NetworkTrafficGenerator class
     # This will only happen on the first run or after clearing cache
@@ -344,7 +363,7 @@ st.session_state.security_alerts = st.session_state.security_alerts[:50]
 # ============================================================================
 # Show device details prominently when a single device is selected
 if selected_device != "All Devices" and selected_device_data:
-    st.markdown(f"### 📱 {selected_device}")
+    st.markdown(f"### {selected_device}")
 
     # Create columns for device details
     detail_col1, detail_col2, detail_col3, detail_col4 = st.columns(4)
@@ -486,7 +505,7 @@ if selected_device != "All Devices" and selected_device in st.session_state.devi
 else:
     history_data = st.session_state.traffic_history
 
-# Only show graph if we have enough data points
+# Only show graph if there are enough data points
 if len(history_data['timestamps']) > 0:
     # Create Plotly figure with two lines (Download and Upload)
     fig_speed = go.Figure()
@@ -539,10 +558,14 @@ else:
 # ============================================================================
 # This section displays a detailed table of all devices on the network
 
-st.subheader("Devices Currently Connected")
+# Change header based on selection
+if selected_device != "All Devices":
+    st.subheader("Current Device")
+else:
+    st.subheader("Devices Currently Connected")
 
 # SELECT COLUMNS TO DISPLAY
-# We added 'connection_type' to show Wired vs Wi-Fi
+# Added 'connection_type' to show Wired vs Wi-Fi
 # Order matters - this is how they'll appear left to right in the table
 display_df = df_filtered[[
     'name',              # Device name (e.g., "Home Desktop PC")
@@ -602,7 +625,7 @@ if selected_device == "All Devices":
         lat='lat',                       # Column name for latitude
         lon='lon',                       # Column name for longitude
         projection='equirectangular',    # Flat map projection for better visibility
-        title='',                        # No title (we have markdown above)
+        title='',                        # No title (markdown above)
         height=450                       # Height of the map in pixels
     )
 

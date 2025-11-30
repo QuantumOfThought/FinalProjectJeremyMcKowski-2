@@ -65,7 +65,7 @@ Jeremy McKowski
 ## Acknowledgments
 
 Inspiration, code snippets, and resources:
-* [Jason Zeller](https://www.youtube.com/@profzeller) - Python programming instruction
+* [Jason Zeller](https://www.youtube.com/@profzeller) 
 * [Streamlit Documentation](https://docs.streamlit.io/) - Web framework documentation
 * [Plotly](https://plotly.com/python/) - Interactive visualization library
 * [AccuWeather API](https://developer.accuweather.com/) - Weather data provider
@@ -76,3 +76,4 @@ Inspiration, code snippets, and resources:
 * [Streamlit Cybersecurity Dashboard](https://github.com/ajitagupta/streamlit-cybersecurity-dashboard) - Dashboard inspiration
 * [Cloud Security Dashboard](https://github.com/VisionHub25/cloud-security-dashboard) - Security monitoring concepts
 * [Build a Real-Time Network Traffic Dashboard - FreeCodeCamp](https://www.freecodecamp.org/news/build-a-real-time-network-traffic-dashboard-with-python-and-streamlit/#heading-future-enhancements) - Tutorial and implementation guidance
+* [Claude Support](https://claude.ai/share/6150eb89-40c3-488c-b223-945e21b6f85a)
