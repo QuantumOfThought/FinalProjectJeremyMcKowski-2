@@ -3,61 +3,86 @@
 #### Final Project
 
 
-# Final Project
+# Ubiquiti Network Monitor Dashboard
 
 ## Description
 
-This web application is designed to display a live dashboard of a home network. 
-It allows a user to have a stand alone display of the home network status, including live metrics to understand the network as well as 
-alerts for unusual activity. For a fun bonus it will include the local weather conditions as well.
+This web application is designed to display a live dashboard of a home network simulating a Ubiquiti router.
 
-Due to some routers limitations, this application also uses Python Faker Data to generate fake data for the network dashboard.
-It will be a stand in for an Ubiquiti router. 
+### Key Features
+
+- **Real-time Network Metrics**: Track connected devices, total download/upload traffic, and device status
+- **30-Minute Throughput Graph**: Live interactive graph showing download and upload speeds over the last 30 minutes
+- **Global Traffic Map**: Visual representation of external connections on an interactive world map
+- **Security Alerts**: Suspicious traffic detection including port scans, risky geolocation connections, data exfiltration attempts, and unusual port access
+- **Weather Widget**: Real-time local weather conditions from AccuWeather API (Hays, KS)
+- **Device Details**: Comprehensive table showing all network devices with MAC addresses, IP addresses, connection types, and traffic statistics
+
+Due to router API limitations, this application uses Python Faker library to generate realistic simulated network traffic data for demonstration purposes of a Ubiquiti Router.
 
 
 ## Getting Started
 
 ### Dependencies
 
-To download all requirements:
+This project requires Python 3.8+ and the following packages:
 
 ```
 pip install -r requirements.txt
 ```
 
-### Executing program
+### Setup Instructions
 
-To create the migration files for the database, run in your terminal:
-```
-python manage.py makemigrations
-```
-An API key from Accuweather is utilized in this project: please create a .env file in your root project directory and obtain an Accuweather API key.
-```
-https://developer.accuweather.com/
-```
-To apply the migrations to the database, run in your terminal:
+1. **Install dependencies:**
+   ```
+   pip install -r requirements.txt
+   ```
 
-To start the server, run in your terminal:
+2. **Configure AccuWeather API:**
+
+An API key from AccuWeather is required for the weather widget. Create a `.env` file in your root project directory: [Accuweather.com API Key](https://developer.accuweather.com/)
+
+### Executing Program
+
+To start the Streamlit dashboard, run in your terminal:
+
 ```
-TEXT HERE NEEDED 
+streamlit run app.py
 ```
 
-After running the server, visit http:// to start the server
+After running the command, the application will automatically open in your default browser at:
+- **Local URL**: http://localhost:8502
 
-### Output
 
-This application displays a live dashboard of a users network.  
+### Using the Dashboard
+
+1. **Enable Live Updates**: Toggle the "Enable Live Updates" checkbox in the sidebar to see real-time data updates
+2. **Adjust Refresh Rate**: Use the slider in the sidebar to control update frequency (1-10 seconds)
+3. **Monitor Devices**: View all connected devices and their traffic statistics in the Device Details table
+4. **Watch for Alerts**: Security alerts appear below the global traffic map when suspicious activity is detected
+5. **Track Throughput**: The 30-minute graph builds up over time showing network speed trends
+
+## Output
+
+This web-app allows users to view a real-time network monitoring dashbaord. of their home network.
+
+I've included a weather API to display weather conditions, using Accuweather.com
+
 ## Authors
 
-Stephen Blomberg
+Jeremy McKowski
 
 ## Acknowledgments
 
-Inspiration, code snippets, etc.
-* [Jason Zeller](https://www.youtube.com/@profzeller)
-* [Django](https://docs.djangoproject.com/en/5.0/)
-* [Jinja](https://jinja.palletsprojects.com/en/stable/)
-* [Bootstrap](https://getbootstrap.com/)
-* [AccuWeather](https://developer.accuweather.com/)
-* [django-crispy-forms](https://django-crispy-forms.readthedocs.io/en/latest/)
-* [ChatGPT](https://chatgpt.com/share/674e43eb-8b44-8002-a965-168b4ffb2b90)
+Inspiration, code snippets, and resources:
+* [Jason Zeller](https://www.youtube.com/@profzeller) - Python programming instruction
+* [Streamlit Documentation](https://docs.streamlit.io/) - Web framework documentation
+* [Plotly](https://plotly.com/python/) - Interactive visualization library
+* [AccuWeather API](https://developer.accuweather.com/) - Weather data provider
+* [AccuWeather Core Weather Quick Start](https://developer.accuweather.com/documentation/core-weather-quick-start) - API integration guide
+* [Faker Documentation](https://faker.readthedocs.io/en/master/) - Realistic fake data generation
+* [Watchdog](https://pypi.org/project/watchdog/) - File system monitoring library
+* [Pandas](https://pandas.pydata.org/) - Data manipulation and analysis
+* [Streamlit Cybersecurity Dashboard](https://github.com/ajitagupta/streamlit-cybersecurity-dashboard) - Dashboard inspiration
+* [Cloud Security Dashboard](https://github.com/VisionHub25/cloud-security-dashboard) - Security monitoring concepts
+* [Build a Real-Time Network Traffic Dashboard - FreeCodeCamp](https://www.freecodecamp.org/news/build-a-real-time-network-traffic-dashboard-with-python-and-streamlit/#heading-future-enhancements) - Tutorial and implementation guidance
