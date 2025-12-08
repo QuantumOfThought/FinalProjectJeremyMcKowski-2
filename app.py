@@ -467,17 +467,17 @@ with header_right:
             severity_color = '#ef4444'
             # Red color (hex code) - use for dangerous vulnerabilities
             # Hex colors: # followed by 6 characters (RRGGBB in hexadecimal)
-            # ef=red, 44=green, 44=blue → mostly red = danger color
+            # ef=red, 44=green, 44=blue = mostly red = danger color
         elif severity == 'MEDIUM':
             # If not critical/high, is it medium?
             severity_color = '#f59e0b'
             # Orange color - use for moderate vulnerabilities
-            # f5=red, 9e=green, 0b=blue → orange = warning color
+            # f5=red, 9e=green, 0b=blue = orange = warning color
         else:
             # If none of the above (LOW or UNKNOWN)
             severity_color = '#10b981'
             # Green color - use for low-risk vulnerabilities
-            # 10=red, b9=green, 81=blue → green = safe/low risk color
+            # 10=red, b9=green, 81=blue = green = safe/low risk color
 
         # =====================================================================
         # STEP 4: CREATE THE WIDGET HEADER BOX
@@ -1611,7 +1611,7 @@ st.dataframe(
         # More descriptive for end users
 
         "type": "Type",
-        # Capitalize for consistency ("type" → "Type")
+        # Capitalize for consistency ("type" becomes "Type")
 
         "ip": "IP Address",
         # Expand abbreviation for clarity
@@ -1951,7 +1951,7 @@ if filtered_alerts:
     display_alerts.columns = ['Time', 'Device', 'External IP', 'Alert Type', 'Severity']
     # Rename columns for professional appearance
     # .columns assignment replaces ALL column names in order
-    # 'reason' → 'Alert Type' (more descriptive)
+    # 'reason' becomes 'Alert Type' (more descriptive)
     # Capitalization for consistency
 
     # -------------------------------------------------------------------------
@@ -2132,7 +2132,7 @@ if auto_refresh:
     #   4. Session state persists (traffic_history, security_alerts, etc.)
     #
     # This creates an infinite loop:
-    #   Run script → Display dashboard → Sleep N seconds → Rerun → Repeat
+    #   Run script, Display dashboard, Sleep N seconds, Rerun, Repeat
     #
     # Loop continues until:
     #   - User unchecks "Enable Live Updates" (auto_refresh becomes False)
