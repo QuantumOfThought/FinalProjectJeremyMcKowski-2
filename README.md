@@ -7,9 +7,9 @@
 
 ## Description
 
-This web application is designed to display a live dashboard of a home network simulating a Ubiquiti router.
+This web application is designed to display a live dashboard for a home network simulating a Ubiquiti router.
 
-Due to router API limitations, this application uses Python Faker library to generate realistic simulated network traffic data for demonstration purposes of a Ubiquiti Router.
+Due to router API limitations, this application uses the Python Faker library to generate realistic simulated network traffic data to demonstrate a Ubiquiti Router.
 
 ## Getting Started
 
@@ -28,9 +28,13 @@ pip install -r requirements.txt
    pip install -r requirements.txt
    ```
 
-2. **Configure AccuWeather API:**
+2. **Configure NVD API (Optional):**
 
-An API key from AccuWeather is required for the weather widget. Create a `.env` file in your root project directory: [Accuweather.com API Key](https://developer.accuweather.com/)
+The CVE widget works without an API key but has rate limits. For better performance, get a free API key from the National Vulnerability Database. Create a `.env` file in your root project directory with:
+   ```
+   NVD_API_KEY=your-api-key-here
+   ```
+   Get your free API key at: [NVD API Key Request](https://nvd.nist.gov/developers/request-an-api-key)
 
 ### Executing Program
 
@@ -54,9 +58,9 @@ After running the command, the application will automatically open in your defau
 
 ## Output
 
-This web-app allows users to view a real-time network monitoring dashbaord of their home network.
+This web-app allows users to view a real-time network monitoring dashboard of their home network.
 
-I've included a weather API to display CVE for Ubiquit Systems Router so a user can see the latest Critical Vulnerabilities that may affect their network security.
+I've included the NVD API to display CVEs for Ubiquiti Systems Routers so a user can see the latest Critical Vulnerabilities that may affect their network security.
 
 ## Authors
 
