@@ -325,3 +325,6 @@ class CVEFetcher:
 #   from cve_fetcher import CVEFetcher
 #   fetcher = CVEFetcher()
 #   cves = fetcher.get_ubiquiti_cves(3)
+
+
+#used claude to clean up the code and help me, as on re-launch of the app I could not get it to work
