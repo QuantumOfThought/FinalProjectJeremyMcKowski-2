@@ -552,15 +552,13 @@ with header_right:
             # -----------------------------------------------------------------
             # STEP 5B: CHECK IF THIS CVE IS ROUTER-RELATED
             # -----------------------------------------------------------------
-            # Some CVEs affect routers specifically, we want to mark those with an icon
+            # Some CVEs affect routers specifically, we want to mark those
             # We check if the 'is_router_related' field is True
-            if cve.get('is_router_related'):
-                # If True, add a globe emoji
-                router_badge = " 🌐"
-                # The space before the emoji is important for spacing
-            else:
-                # If False or doesn't exist, use empty string (no badge)
-                router_badge = ""
+            # NOTE: Router badge emoji removed per user request
+            # We still track if it's router-related in the data, just don't display a badge
+            router_badge = ""
+            # No badge is displayed anymore (emoji removed)
+            # This keeps the code simple and clean
 
             # -----------------------------------------------------------------
             # STEP 5C: BUILD THE NVD URL FOR THIS CVE
@@ -664,7 +662,7 @@ with header_right:
         st.markdown(
             """
             <div style='text-align: center; margin-top: 10px;'>
-                <a href='https://nvd.nist.gov/vuln/search/results?form_type=Basic&results_type=overview&query=Ubiquiti&search_type=all'
+                <a href='https://nvd.nist.gov/vuln/search#/nvd/home?keyword=Ubiquiti&resultType=records'
                    target='_blank'
                    style='
                        color: #00d4ff;
@@ -672,7 +670,7 @@ with header_right:
                        font-size: 12px;
                        font-weight: 500;
                    '>
-                    🔍 View All Ubiquiti CVEs on NVD →
+                    View All Ubiquiti CVEs on NVD
                 </a>
             </div>
             """,
@@ -682,27 +680,28 @@ with header_right:
             #   - text-align: center = center the link horizontally
             #   - margin-top: 10px = space above the link
             #
-            # <a href='https://nvd.nist.gov/vuln/search/results?...' target='_blank'>
+            # <a href='https://nvd.nist.gov/vuln/search#/nvd/home?...' target='_blank'>
             #   - This URL goes to NVD's search page
-            #   - The query parameters:
-            #     * form_type=Basic = use basic search
-            #     * results_type=overview = show overview of results
-            #     * query=Ubiquiti = search for "Ubiquiti"
-            #     * search_type=all = search all fields
-            #   - target='_blank' = open in new tab
+            #   - The URL structure:
+            #     * /vuln/search = NVD vulnerability search interface
+            #     * #/nvd/home = navigation to NVD home section
+            #     * ?keyword=Ubiquiti = search keyword parameter
+            #     * &resultType=records = display results as records (detailed view)
+            #   - target='_blank' = open in new tab (don't leave the dashboard)
+            #   - This keeps the user's dashboard open while viewing CVE details
             #
             # style='color: #00d4ff; text-decoration: none; ...'
-            #   - color: #00d4ff = cyan color (matches download theme)
-            #   - text-decoration: none = no underline
-            #   - font-size: 12px = small text
+            #   - color: #00d4ff = cyan color (matches download theme throughout dashboard)
+            #   - text-decoration: none = no underline (cleaner look)
+            #   - font-size: 12px = small text (not too prominent)
             #   - font-weight: 500 = medium weight (between normal and bold)
             #
-            # 🔍 View All Ubiquiti CVEs on NVD →
-            #   - 🔍 = magnifying glass emoji (indicates search/view)
-            #   - → = arrow emoji (indicates external link)
+            # View All Ubiquiti CVEs on NVD
+            #   - Simple, clear text (emojis removed per user request)
+            #   - Tells user exactly what will happen when they click
 
             unsafe_allow_html=True
-            # Allow the HTML to render
+            # Allow the HTML to render (we trust our own HTML code)
         )
 
     else:
