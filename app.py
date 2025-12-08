@@ -1,7 +1,7 @@
 """
 Ubiquiti Network Monitor Dashboard
 This application provides real-time monitoring of network devices, traffic patterns,
-security alerts, and weather information in a professional dashboard interface.
+security alerts, and CVE vulnerability tracking in a professional dashboard interface.
 
 Author: Jeremy McKowski
 Date: November 2025
@@ -49,10 +49,10 @@ from data_generator import NetworkTrafficGenerator
 # Generates realistic device names, IP addresses, traffic volumes, security alerts
 # This keeps the dashboard demo functional without requiring actual network hardware
 
-from weather import WeatherFetcher
-# Custom module that retrieves real weather data from AccuWeather API
-# Adds weather widget to dashboard for environmental context
-# Uses API calls to get current conditions for a specified location
+from cve_fetcher import CVEFetcher
+# Custom module that retrieves CVE vulnerability data from National Vulnerability Database
+# Adds security vulnerability tracking for Ubiquiti devices
+# Displays latest CVEs related to Ubiquiti and Ubiquiti routers
 
 # ============================================================================
 # STEP 1: PAGE CONFIGURATION
@@ -238,11 +238,11 @@ if 'traffic_generator' not in st.session_state:
     #   2. Traffic counters accumulate properly (don't reset)
     #   3. Better performance (don't recreate objects unnecessarily)
 
-if 'weather_fetcher' not in st.session_state:
+if 'cve_fetcher' not in st.session_state:
     # Same pattern: create once, reuse across reruns
-    st.session_state.weather_fetcher = WeatherFetcher()
-    # WeatherFetcher is a class from weather.py
-    # It makes API calls to AccuWeather to get real weather data
+    st.session_state.cve_fetcher = CVEFetcher()
+    # CVEFetcher is a class from cve_fetcher.py
+    # It makes API calls to NVD (National Vulnerability Database) to get CVE data
     # Persisting it allows caching of API responses (avoid rate limits)
 
 if 'traffic_history' not in st.session_state:
@@ -350,7 +350,7 @@ st.sidebar.title("About")
 st.sidebar.info(
     "Real-time network monitoring dashboard for Ubiquiti devices. "
     "Tracks connected devices, bandwidth usage, security alerts, and global traffic patterns. "
-    "Features live throughput monitoring and weather integration."
+    "Features live throughput monitoring and CVE vulnerability tracking."
 )
 # .info() creates a blue information box with an icon
 # Alternative options: .success() (green), .warning() (yellow), .error() (red)
@@ -406,57 +406,82 @@ with header_left:
     # Note: These values are hardcoded placeholders (would be dynamic in production)
 
 # ----------------------------------------------------------------------------
-# RIGHT HEADER: WEATHER WIDGET
+# RIGHT HEADER: CVE VULNERABILITY WIDGET
 # ----------------------------------------------------------------------------
 with header_right:
-    # This column displays real-time weather data from AccuWeather API
+    # This column displays latest CVE vulnerabilities from NVD API
 
-    weather_data = st.session_state.weather_fetcher.get_current_weather()
-    # Call the weather fetcher to get current conditions
-    # Returns a dictionary with keys: 'city', 'temperature', 'unit', 'weather_text', 'humidity'
-    # Returns None if the API call fails (network error, invalid API key, etc.)
+    cve_data = st.session_state.cve_fetcher.get_ubiquiti_cves(max_results=3)
+    # Call the CVE fetcher to get latest Ubiquiti vulnerabilities
+    # Returns a list of dictionaries with CVE information
+    # Returns None if the API call fails (network error, API issues, etc.)
     # This is stored in session_state from STEP 3, so the object persists
 
-    if weather_data:
-        # Only display widget if weather data was successfully fetched
-        # If API call failed, weather_data will be None (falsy) and this block skips
+    if cve_data and len(cve_data) > 0:
+        # Only display widget if CVE data was successfully fetched
+        # If API call failed, cve_data will be None (falsy) and this block skips
+
+        # Determine severity color for the first (most recent) CVE
+        first_cve = cve_data[0]
+        severity = first_cve.get('severity', 'UNKNOWN')
+        if severity in ['CRITICAL', 'HIGH']:
+            severity_color = '#ef4444'  # Red for critical/high
+        elif severity == 'MEDIUM':
+            severity_color = '#f59e0b'  # Orange for medium
+        else:
+            severity_color = '#10b981'  # Green for low/unknown
 
         st.markdown(
             f"""
             <div style='
                 background: #000000;
-                border: 1px solid #ffffff;
+                border: 1px solid {severity_color};
                 border-radius: 8px;
                 padding: 15px;
                 color: white;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
                 margin-bottom: 10px;
             '>
-                <div>
-                    <div style='font-size: 14px; color: #888;'>{weather_data['city']}</div>
-                    <div style='font-size: 24px; font-weight: bold;'>{weather_data['temperature']}°{weather_data['unit']}</div>
-                </div>
-                <div style='text-align: right;'>
-                    <div style='font-size: 14px;'>{weather_data['weather_text']}</div>
-                    <div style='font-size: 12px; color: #888;'>Humidity: {weather_data['humidity']}%</div>
-                </div>
-            </div>
+                <div style='font-size: 16px; font-weight: 500; margin-bottom: 8px; color: {severity_color};'>Latest Ubiquiti CVEs</div>
+                <div style='font-size: 14px; color: #888; margin-bottom: 10px;'>Recent Security Vulnerabilities</div>
             """,
             unsafe_allow_html=True
         )
-        # F-string (f"...") allows embedding Python variables in the HTML
-        # {weather_data['city']} gets replaced with actual value (e.g., "Hays, KS")
-        # CSS Flexbox layout:
-        #   - display: flex creates a flexible container
-        #   - justify-content: space-between pushes left/right content to edges
-        #   - align-items: center vertically centers content
-        # Left side shows: City name and temperature (large)
-        # Right side shows: Conditions (e.g., "Clear") and humidity
-        # Black background with white border for visual contrast with ISP widget
+
+        # Display each CVE
+        for cve in cve_data:
+            severity = cve.get('severity', 'UNKNOWN')
+            if severity in ['CRITICAL', 'HIGH']:
+                color = '#ef4444'
+            elif severity == 'MEDIUM':
+                color = '#f59e0b'
+            else:
+                color = '#10b981'
+
+            router_badge = " 🌐" if cve.get('is_router_related') else ""
+
+            st.markdown(
+                f"""
+                <div style='
+                    background: #1a1a1a;
+                    border-left: 3px solid {color};
+                    padding: 8px 10px;
+                    margin-bottom: 8px;
+                    border-radius: 4px;
+                '>
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;'>
+                        <span style='font-size: 13px; font-weight: bold; color: white;'>{cve['id']}{router_badge}</span>
+                        <span style='font-size: 11px; color: {color};'>{severity} ({cve['cvss_score']})</span>
+                    </div>
+                    <div style='font-size: 11px; color: #999;'>{cve['published']}</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
     else:
-        # Fallback display if weather API call failed
+        # Fallback display if CVE API call failed
         st.markdown(
             """
             <div style='
@@ -467,14 +492,14 @@ with header_right:
                 color: #888;
                 text-align: center;
             '>
-                Weather unavailable
+                CVE data unavailable
             </div>
             """,
             unsafe_allow_html=True
         )
         # Simple error message maintaining the same visual style
         # Gray text (#888) indicates error/disabled state
-        # Prevents empty space if weather fails to load
+        # Prevents empty space if CVE data fails to load
 
 # ----------------------------------------------------------------------------
 # MAIN DASHBOARD TITLE

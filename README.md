@@ -54,9 +54,9 @@ After running the command, the application will automatically open in your defau
 
 ## Output
 
-This web-app allows users to view a real-time network monitoring dashbaord. of their home network.
+This web-app allows users to view a real-time network monitoring dashbaord of their home network.
 
-I've included a weather API to display weather conditions, using Accuweather.com
+I've included a weather API to display CVE for Ubiquit Systems Router so a user can see the latest Critical Vulnerabilities that may affect their network security.
 
 ## Authors
 
