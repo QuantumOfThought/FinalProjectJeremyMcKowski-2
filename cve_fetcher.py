@@ -118,26 +118,24 @@ class CVEFetcher:
             # SET UP THE SEARCH PARAMETERS
             # =================================================================
             # I create a dictionary with my search criteria
+            # NVD API v2.0 requires specific parameter format
             params = {
                 'keywordSearch': 'Ubiquiti',
-                'resultsPerPage': 20,
-                'startIndex': 0
+                'resultsPerPage': 5
             }
             # keywordSearch: I'm looking for anything mentioning "Ubiquiti"
-            # resultsPerPage: I request 20 results (even though I only need 3)
-            #                 because some might not have all the data I need
-            # startIndex: Start from the beginning (result #0)
+            # resultsPerPage: Limit to 5 results to reduce data transfer
 
             # =================================================================
             # ADD MY API KEY TO THE HEADERS (IF I HAVE ONE)
             # =================================================================
             # I learned that NVD API v2.0 wants the API key in the headers
-            # not in the URL parameters (that's different from v1.0)
+            # The correct header name is 'X-API-Key' (not 'apiKey')
             headers = {}
 
             # If I have an API key, I add it to the headers
             if self.api_key:
-                headers['apiKey'] = self.api_key
+                headers['X-API-Key'] = self.api_key
                 # This gives me 50 requests/30sec instead of just 5
             # If I don't have a key, I just leave headers empty and it still works
 
