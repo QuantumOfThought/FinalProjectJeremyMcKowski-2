@@ -9,7 +9,7 @@
 
 This web application is designed to display a live dashboard for a home network simulating a Ubiquiti router.
 
-Due to router API limitations, this application uses the Python Faker library to generate realistic simulated network traffic data to demonstrate a Ubiquiti Router.
+Due to router API limitations, this application uses the Python Faker library to generate realistic simulated network traffic data for demonstration purposes.
 
 ## Getting Started
 
@@ -30,7 +30,7 @@ pip install -r requirements.txt
 
 2. **Configure NVD API (Optional):**
 
-The CVE widget works without an API key but has rate limits. For better performance, get a free API key from the National Vulnerability Database. Create a `.env` file in your root project directory with:
+   The CVE widget works without an API key but has rate limits. For better performance, get a free API key from the National Vulnerability Database. Create a `.env` file in your root project directory with:
    ```
    NVD_API_KEY=your-api-key-here
    ```
@@ -58,9 +58,9 @@ After running the command, the application will automatically open in your defau
 
 ## Output
 
-This web-app allows users to view a real-time network monitoring dashboard of their home network.
+This web app allows users to view a real-time network monitoring dashboard of their home network.
 
-I've included the NVD API to display CVEs for Ubiquiti Systems Routers so a user can see the latest Critical Vulnerabilities that may affect their network security.
+I've included the NVD API to display CVEs for Ubiquiti routers so users can see the latest critical vulnerabilities that may affect their network security.
 
 ## Authors
 
@@ -72,7 +72,7 @@ Inspiration, code snippets, and resources:
 * [Jason Zeller](https://www.youtube.com/@profzeller) 
 * [Streamlit Documentation](https://docs.streamlit.io/) - Web framework documentation
 * [Plotly](https://plotly.com/python/) - Interactive visualization library
-* [National Vulnerability Database -NIST](https://nvd.nist.gov/developers/vulnerabilities) - API integration guide
+* [National Vulnerability Database - NIST](https://nvd.nist.gov/developers/vulnerabilities) - API integration guide
 * [Faker Documentation](https://faker.readthedocs.io/en/master/) - Realistic fake data generation
 * [Watchdog](https://pypi.org/project/watchdog/) - File system monitoring library
 * [Pandas](https://pandas.pydata.org/) - Data manipulation and analysis
