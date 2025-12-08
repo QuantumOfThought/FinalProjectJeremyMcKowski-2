@@ -68,8 +68,7 @@ Inspiration, code snippets, and resources:
 * [Jason Zeller](https://www.youtube.com/@profzeller) 
 * [Streamlit Documentation](https://docs.streamlit.io/) - Web framework documentation
 * [Plotly](https://plotly.com/python/) - Interactive visualization library
-* [AccuWeather API](https://developer.accuweather.com/) - Weather data provider
-* [AccuWeather Core Weather Quick Start](https://developer.accuweather.com/documentation/core-weather-quick-start) - API integration guide
+* [National Vulnerability Database -NIST](https://nvd.nist.gov/developers/vulnerabilities) - API integration guide
 * [Faker Documentation](https://faker.readthedocs.io/en/master/) - Realistic fake data generation
 * [Watchdog](https://pypi.org/project/watchdog/) - File system monitoring library
 * [Pandas](https://pandas.pydata.org/) - Data manipulation and analysis

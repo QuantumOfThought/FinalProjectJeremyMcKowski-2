@@ -408,30 +408,85 @@ with header_left:
 # ----------------------------------------------------------------------------
 # RIGHT HEADER: CVE VULNERABILITY WIDGET
 # ----------------------------------------------------------------------------
+# CVE = Common Vulnerabilities and Exposures
+# This is a standard way to identify security vulnerabilities in software
+# Example: CVE-2024-1234 uniquely identifies a specific security flaw
+# This section displays the latest security vulnerabilities found in Ubiquiti products
+
 with header_right:
-    # This column displays latest CVE vulnerabilities from NVD API
+    # We're working in the right column of the header (remember we made 2 columns earlier)
+    # The left column shows ISP info, this right column shows CVE security info
 
+    # =========================================================================
+    # STEP 1: FETCH CVE DATA FROM OUR CVE FETCHER
+    # =========================================================================
+    # Get the CVE fetcher object from session state (we created this earlier)
+    # Then call its method to get the latest 3 Ubiquiti vulnerabilities
     cve_data = st.session_state.cve_fetcher.get_ubiquiti_cves(max_results=3)
-    # Call the CVE fetcher to get latest Ubiquiti vulnerabilities
-    # Returns a list of dictionaries with CVE information
-    # Returns None if the API call fails (network error, API issues, etc.)
-    # This is stored in session_state from STEP 3, so the object persists
+    # What this returns:
+    #   - If successful: A list of dictionaries, each containing CVE info
+    #   - If failed: None (could be network error, API down, etc.)
+    # Example of what cve_data might look like:
+    # [
+    #   {'id': 'CVE-2024-1234', 'severity': 'HIGH', 'cvss_score': 8.5, ...},
+    #   {'id': 'CVE-2024-5678', 'severity': 'MEDIUM', 'cvss_score': 6.2, ...},
+    #   {'id': 'CVE-2024-9012', 'severity': 'LOW', 'cvss_score': 3.1, ...}
+    # ]
 
+    # =========================================================================
+    # STEP 2: CHECK IF WE GOT DATA SUCCESSFULLY
+    # =========================================================================
+    # We need to check two things:
+    # 1. Is cve_data not None? (did the API call succeed?)
+    # 2. Does the list have at least 1 item? (are there any CVEs?)
     if cve_data and len(cve_data) > 0:
-        # Only display widget if CVE data was successfully fetched
-        # If API call failed, cve_data will be None (falsy) and this block skips
+        # Great! We have CVE data to display
+        # The 'and' means BOTH conditions must be True
+        # If cve_data is None, Python won't even check len() (short-circuit evaluation)
 
-        # Determine severity color for the first (most recent) CVE
+        # =====================================================================
+        # STEP 3: DETERMINE COLOR FOR THE WIDGET BORDER
+        # =====================================================================
+        # We want the border color to match the severity of the MOST RECENT CVE
+        # The most recent CVE is the first one in the list (index 0)
         first_cve = cve_data[0]
-        severity = first_cve.get('severity', 'UNKNOWN')
-        if severity in ['CRITICAL', 'HIGH']:
-            severity_color = '#ef4444'  # Red for critical/high
-        elif severity == 'MEDIUM':
-            severity_color = '#f59e0b'  # Orange for medium
-        else:
-            severity_color = '#10b981'  # Green for low/unknown
+        # Get the first CVE from the list
+        # Example: first_cve = {'id': 'CVE-2024-1234', 'severity': 'HIGH', ...}
 
+        # Extract the severity level from the CVE dictionary
+        # .get() is safer than ['severity'] because it won't crash if key doesn't exist
+        # The second parameter 'UNKNOWN' is the default value if severity key is missing
+        severity = first_cve.get('severity', 'UNKNOWN')
+        # severity will be something like: 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW', or 'UNKNOWN'
+
+        # Now we pick a color based on severity
+        # We use an if-elif-else chain (like a series of questions)
+        if severity in ['CRITICAL', 'HIGH']:
+            # Is severity either CRITICAL or HIGH?
+            # 'in' checks if the value is in the list
+            severity_color = '#ef4444'
+            # Red color (hex code) - use for dangerous vulnerabilities
+            # Hex colors: # followed by 6 characters (RRGGBB in hexadecimal)
+            # ef=red, 44=green, 44=blue → mostly red = danger color
+        elif severity == 'MEDIUM':
+            # If not critical/high, is it medium?
+            severity_color = '#f59e0b'
+            # Orange color - use for moderate vulnerabilities
+            # f5=red, 9e=green, 0b=blue → orange = warning color
+        else:
+            # If none of the above (LOW or UNKNOWN)
+            severity_color = '#10b981'
+            # Green color - use for low-risk vulnerabilities
+            # 10=red, b9=green, 81=blue → green = safe/low risk color
+
+        # =====================================================================
+        # STEP 4: CREATE THE WIDGET HEADER BOX
+        # =====================================================================
+        # We use st.markdown() with HTML/CSS to create a custom styled box
+        # Why? Streamlit's built-in widgets don't give us enough control over appearance
         st.markdown(
+            # f-string (f"...") lets us insert Python variables into the string
+            # Variables in {curly braces} get replaced with their values
             f"""
             <div style='
                 background: #000000;
@@ -444,45 +499,223 @@ with header_right:
                 <div style='font-size: 16px; font-weight: 500; margin-bottom: 8px; color: {severity_color};'>Latest Ubiquiti CVEs</div>
                 <div style='font-size: 14px; color: #888; margin-bottom: 10px;'>Recent Security Vulnerabilities</div>
             """,
+            # Let me explain this HTML/CSS:
+            # - <div> = division/container element in HTML
+            # - style='...' = inline CSS styling
+            # - background: #000000 = black background
+            # - border: 1px solid {severity_color} = thin border with color based on severity
+            # - border-radius: 8px = rounded corners (8 pixels of rounding)
+            # - padding: 15px = space inside the box (15 pixels on all sides)
+            # - color: white = text color is white
+            # - margin-bottom: 10px = space below the box
+            # The {severity_color} gets replaced with the color variable we set above
+
             unsafe_allow_html=True
+            # This tells Streamlit: "Yes, I know I'm using HTML, please render it"
+            # By default, Streamlit escapes HTML (displays it as text for security)
+            # Setting this to True allows the HTML to actually render
+            # Only do this with code YOU write, never with user input!
+        )
+        # At this point, we've opened the container but haven't closed it yet
+        # We'll close it later after displaying all the CVEs
+
+        # =====================================================================
+        # STEP 5: LOOP THROUGH EACH CVE AND DISPLAY IT
+        # =====================================================================
+        # We have 3 CVEs in our list, we need to display each one
+        # A 'for' loop lets us repeat code for each item in a list
+        for cve in cve_data:
+            # 'for' loop explanation:
+            # - 'cve' is a variable that will hold each CVE one at a time
+            # - 'in cve_data' means loop through the cve_data list
+            # - First iteration: cve = first CVE
+            # - Second iteration: cve = second CVE
+            # - Third iteration: cve = third CVE
+            # Example: cve = {'id': 'CVE-2024-1234', 'severity': 'HIGH', ...}
+
+            # -----------------------------------------------------------------
+            # STEP 5A: DETERMINE COLOR FOR THIS SPECIFIC CVE
+            # -----------------------------------------------------------------
+            # Each CVE might have a different severity, so we need to check again
+            severity = cve.get('severity', 'UNKNOWN')
+            # Get the severity for THIS specific CVE
+            # Same as before, .get() with default 'UNKNOWN'
+
+            # Now pick the color for THIS CVE (same logic as before)
+            if severity in ['CRITICAL', 'HIGH']:
+                color = '#ef4444'  # Red
+            elif severity == 'MEDIUM':
+                color = '#f59e0b'  # Orange
+            else:
+                color = '#10b981'  # Green
+
+            # -----------------------------------------------------------------
+            # STEP 5B: CHECK IF THIS CVE IS ROUTER-RELATED
+            # -----------------------------------------------------------------
+            # Some CVEs affect routers specifically, we want to mark those with an icon
+            # We check if the 'is_router_related' field is True
+            if cve.get('is_router_related'):
+                # If True, add a globe emoji
+                router_badge = " 🌐"
+                # The space before the emoji is important for spacing
+            else:
+                # If False or doesn't exist, use empty string (no badge)
+                router_badge = ""
+
+            # -----------------------------------------------------------------
+            # STEP 5C: BUILD THE NVD URL FOR THIS CVE
+            # -----------------------------------------------------------------
+            # NVD = National Vulnerability Database (run by US government)
+            # Every CVE has a page on NVD with detailed information
+            # The URL format is always: https://nvd.nist.gov/vuln/detail/CVE-XXXX-XXXXX
+            # We just need to add the CVE ID to the end
+
+            cve_id = cve['id']
+            # Get the CVE ID (like "CVE-2024-1234")
+            # We use ['id'] not .get() because we KNOW this field exists
+            # (our CVE fetcher always includes it)
+
+            cve_url = f"https://nvd.nist.gov/vuln/detail/{cve_id}"
+            # Build the complete URL by inserting the CVE ID
+            # Example result: "https://nvd.nist.gov/vuln/detail/CVE-2024-1234"
+            # Users can click this to read full details about the vulnerability
+
+            # -----------------------------------------------------------------
+            # STEP 5D: DISPLAY THIS CVE AS A CLICKABLE CARD
+            # -----------------------------------------------------------------
+            st.markdown(
+                # Again using f-string to insert multiple variables
+                f"""
+                <a href='{cve_url}' target='_blank' style='text-decoration: none;'>
+                    <div style='
+                        background: #1a1a1a;
+                        border-left: 3px solid {color};
+                        padding: 8px 10px;
+                        margin-bottom: 8px;
+                        border-radius: 4px;
+                        transition: background 0.2s;
+                    '>
+                        <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;'>
+                            <span style='font-size: 13px; font-weight: bold; color: white;'>{cve_id}{router_badge}</span>
+                            <span style='font-size: 11px; color: {color};'>{severity} ({cve['cvss_score']})</span>
+                        </div>
+                        <div style='font-size: 11px; color: #999;'>{cve['published']}</div>
+                    </div>
+                </a>
+                """,
+                # Let me explain this HTML/CSS in detail:
+                #
+                # <a href='...' target='_blank' style='text-decoration: none;'>
+                #   - <a> = anchor tag = hyperlink
+                #   - href='{cve_url}' = where the link goes (the NVD page)
+                #   - target='_blank' = open in NEW tab (don't leave dashboard)
+                #   - text-decoration: none = remove underline from link
+                #
+                # <div style='...'>
+                #   - background: #1a1a1a = very dark gray (darker than outer box)
+                #   - border-left: 3px solid {color} = thick left border with severity color
+                #   - padding: 8px 10px = space inside (8px top/bottom, 10px left/right)
+                #   - margin-bottom: 8px = space between CVE cards
+                #   - border-radius: 4px = slightly rounded corners
+                #   - transition: background 0.2s = smooth color change on hover (0.2 seconds)
+                #
+                # <div style='display: flex; justify-content: space-between; ...'>
+                #   - display: flex = use flexbox layout (modern CSS layout system)
+                #   - justify-content: space-between = push content to left and right edges
+                #   - align-items: center = vertically center the content
+                #   - This creates a row with CVE ID on left, severity on right
+                #
+                # <span style='font-size: 13px; font-weight: bold; color: white;'>
+                #   - <span> = inline element (doesn't create new line)
+                #   - font-size: 13px = text size in pixels
+                #   - font-weight: bold = make text bold
+                #   - color: white = white text
+                #   - {cve_id}{router_badge} = CVE ID + optional globe icon
+                #
+                # <span style='font-size: 11px; color: {color};'>
+                #   - Smaller text (11px) for severity info
+                #   - color: {color} = use the severity color (red/orange/green)
+                #   - {severity} ({cve['cvss_score']}) = "HIGH (8.5)" for example
+                #
+                # <div style='font-size: 11px; color: #999;'>
+                #   - Small gray text for the published date
+                #   - #999 = medium gray
+                #   - {cve['published']} = date like "2024-11-30"
+
+                unsafe_allow_html=True
+                # Again, allow HTML to render (we trust our own code)
+            )
+            # The for loop will repeat this for each CVE in the list
+            # After 3 iterations (3 CVEs), the loop ends
+
+        # =====================================================================
+        # STEP 6: CLOSE THE MAIN WIDGET CONTAINER
+        # =====================================================================
+        # Remember we opened a <div> way back in STEP 4?
+        # HTML tags must be closed, or the page layout breaks
+        st.markdown("</div>", unsafe_allow_html=True)
+        # This closes the outer container div
+        # </div> is the closing tag (note the /)
+
+        # =====================================================================
+        # STEP 7: ADD A "VIEW ALL" LINK BELOW THE WIDGET
+        # =====================================================================
+        # Give users a way to see ALL Ubiquiti CVEs, not just the latest 3
+        st.markdown(
+            """
+            <div style='text-align: center; margin-top: 10px;'>
+                <a href='https://nvd.nist.gov/vuln/search/results?form_type=Basic&results_type=overview&query=Ubiquiti&search_type=all'
+                   target='_blank'
+                   style='
+                       color: #00d4ff;
+                       text-decoration: none;
+                       font-size: 12px;
+                       font-weight: 500;
+                   '>
+                    🔍 View All Ubiquiti CVEs on NVD →
+                </a>
+            </div>
+            """,
+            # Let me explain this link:
+            #
+            # <div style='text-align: center; margin-top: 10px;'>
+            #   - text-align: center = center the link horizontally
+            #   - margin-top: 10px = space above the link
+            #
+            # <a href='https://nvd.nist.gov/vuln/search/results?...' target='_blank'>
+            #   - This URL goes to NVD's search page
+            #   - The query parameters:
+            #     * form_type=Basic = use basic search
+            #     * results_type=overview = show overview of results
+            #     * query=Ubiquiti = search for "Ubiquiti"
+            #     * search_type=all = search all fields
+            #   - target='_blank' = open in new tab
+            #
+            # style='color: #00d4ff; text-decoration: none; ...'
+            #   - color: #00d4ff = cyan color (matches download theme)
+            #   - text-decoration: none = no underline
+            #   - font-size: 12px = small text
+            #   - font-weight: 500 = medium weight (between normal and bold)
+            #
+            # 🔍 View All Ubiquiti CVEs on NVD →
+            #   - 🔍 = magnifying glass emoji (indicates search/view)
+            #   - → = arrow emoji (indicates external link)
+
+            unsafe_allow_html=True
+            # Allow the HTML to render
         )
 
-        # Display each CVE
-        for cve in cve_data:
-            severity = cve.get('severity', 'UNKNOWN')
-            if severity in ['CRITICAL', 'HIGH']:
-                color = '#ef4444'
-            elif severity == 'MEDIUM':
-                color = '#f59e0b'
-            else:
-                color = '#10b981'
-
-            router_badge = " 🌐" if cve.get('is_router_related') else ""
-
-            st.markdown(
-                f"""
-                <div style='
-                    background: #1a1a1a;
-                    border-left: 3px solid {color};
-                    padding: 8px 10px;
-                    margin-bottom: 8px;
-                    border-radius: 4px;
-                '>
-                    <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;'>
-                        <span style='font-size: 13px; font-weight: bold; color: white;'>{cve['id']}{router_badge}</span>
-                        <span style='font-size: 11px; color: {color};'>{severity} ({cve['cvss_score']})</span>
-                    </div>
-                    <div style='font-size: 11px; color: #999;'>{cve['published']}</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
     else:
-        # Fallback display if CVE API call failed
+        # =====================================================================
+        # ERROR CASE: CVE DATA UNAVAILABLE
+        # =====================================================================
+        # If we reach this 'else' block, it means:
+        # - Either cve_data is None (API call failed)
+        # - Or cve_data is an empty list (no CVEs found)
+        # We show a simple error message so the space isn't blank
+
         st.markdown(
+            # Simple box with error message
             """
             <div style='
                 background: #000000;
@@ -495,11 +728,24 @@ with header_right:
                 CVE data unavailable
             </div>
             """,
+            # CSS explanation:
+            # - background: #000000 = black (same as working widget)
+            # - border: 1px solid #ffffff = white border (neutral, no severity)
+            # - border-radius: 8px = rounded corners (same as working widget)
+            # - padding: 15px = space inside
+            # - color: #888 = gray text (indicates disabled/error state)
+            # - text-align: center = center the error message
+            #
+            # The message "CVE data unavailable" tells the user:
+            # - There's nothing wrong with the dashboard
+            # - The CVE API just isn't responding right now
+            # - They should try refreshing later
+
             unsafe_allow_html=True
+            # Allow HTML rendering
         )
-        # Simple error message maintaining the same visual style
-        # Gray text (#888) indicates error/disabled state
-        # Prevents empty space if CVE data fails to load
+        # No need to add detailed comments here since it's just an error message
+        # The important part is that we show SOMETHING instead of blank space
 
 # ----------------------------------------------------------------------------
 # MAIN DASHBOARD TITLE
