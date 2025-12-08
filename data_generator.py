@@ -1,3 +1,13 @@
+# =============================================================================
+# NETWORK TRAFFIC GENERATOR MODULE
+# =============================================================================
+# INF601 - Advanced Programming in Python
+# Jeremy McKowski
+# Final Project
+#
+# NOTE: I did use Claude to help clean up my messy comments, check for grammar,
+# and better format it for demo.
+
 import random
 from faker import Faker
 from datetime import datetime, timedelta
@@ -108,7 +118,7 @@ class NetworkTrafficGenerator:
         Internal method to simulate traffic changes and connection status.
         """
         for device in self.devices:
-            # Randomly toggle status for Printer and Android
+            # Randomly toggle status for Printer and Android ## used claude to help with this part, as I could not get it to work
             if device["name"] in ["Home Printer", "Guest Android"]:
                 # 10% chance to flip status
                 if random.random() < 0.1:
@@ -291,3 +301,5 @@ class NetworkTrafficGenerator:
             alerts.append(alert)
 
         return alerts
+
+###///###

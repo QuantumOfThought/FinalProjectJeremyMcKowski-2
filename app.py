@@ -3,9 +3,11 @@ Ubiquiti Network Monitor Dashboard
 This application provides real-time monitoring of network devices, traffic patterns,
 security alerts, and CVE vulnerability tracking in a professional dashboard interface.
 
-Author: Jeremy McKowski
-Date: November 2025
-Course: PYTHON_CLASS Final Project
+INF601 - Advanced Programming in Python
+Jeremy McKowski
+Final Project
+
+NOTE: I did use Claude to help clean up my messy comments, check for grammar, and better format it for demo.
 """
 
 # ============================================================================
@@ -79,14 +81,18 @@ st.set_page_config(
 # My professor showed me how to inject CSS using st.markdown()
 # I have to set unsafe_allow_html=True so Streamlit actually runs my CSS
 
-st.markdown("""
+st.markdown(""" 
     <style>
         /* ================================================================
            HIDING STREAMLIT UI ELEMENTS
            ================================================================
            I'm hiding some default Streamlit elements that look unprofessional
-           My professor said this makes the dashboard look better for demos
+           I used other dashbaords as a guide.
         */
+        
+        
+## I used claude to help figure out what the other dashboard hid
+
 
         /* I'm hiding the running man icon that shows in the corner */
         .stStatusWidget {
@@ -130,6 +136,8 @@ st.markdown("""
            I'm disabling all the fade effects because they made my dashboard
            flicker during auto-refresh. I want instant updates instead.
         */
+        
+## I had issues getting it to render, Claude assisted in ensuring I had less flicker
 
         /* I'm applying this to every element on the page */
         *, *::before, *::after {
@@ -193,14 +201,14 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 # I have to set unsafe_allow_html=True to make the CSS work
-# My professor warned us this is a security risk with user input
-# But it's safe here because I wrote all the CSS myself (not from users)
+# My professor warned us this is a security risk with user input #Github reviee profZ youtube
+# I used claude to ensure safe CSS
 
 # ============================================================================
 # STEP 3: SESSION STATE INITIALIZATION
 # ============================================================================
 # I'm using st.session_state to store data that needs to persist across refreshes
-# My professor taught us that Streamlit reruns the whole script every time
+# As Streamlit reruns the whole script every time
 # something changes (button click, slider move, dropdown selection, etc.)
 #
 # The problem is that without session_state, my variables would reset to zero
@@ -209,6 +217,8 @@ st.markdown("""
 #
 # So I'm using st.session_state as "memory" that survives the reruns
 # It's like a dictionary that Streamlit maintains between page refreshes
+
+##claude assisted in helping make sure I did this right
 
 if 'traffic_generator' not in st.session_state:
     # I check if traffic_generator already exists before creating it
@@ -251,7 +261,6 @@ if 'security_alerts' not in st.session_state:
 # STEP 4: SIDEBAR CONTROLS AND USER INPUTS
 # ============================================================================
 # I'm putting my user controls in the sidebar on the left
-# My professor showed us that sidebars keep controls organized and out of the way
 # Users can collapse the sidebar if they want more screen space
 
 st.sidebar.title("Controls")
@@ -525,6 +534,8 @@ with header_right:
         # =====================================================================
         # If I get here, the API call failed or returned no CVEs
         # I show an error message so the widget space isn't just blank
+
+    #couldnt get this to work, so claude helped me
 
         st.markdown(
             """
@@ -1709,3 +1720,5 @@ if auto_refresh:
 #   - Script never reaches this point
 #   - It reruns from the top before getting here
 #   - Creates continuous refresh loop
+
+###///###

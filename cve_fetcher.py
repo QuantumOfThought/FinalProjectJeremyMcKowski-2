@@ -1,6 +1,13 @@
 # =============================================================================
 # CVE FETCHER MODULE
 # =============================================================================
+# INF601 - Advanced Programming in Python
+# Jeremy McKowski
+# Final Project
+#
+# NOTE: I did use Claude to help clean up my messy comments, check for grammar,
+# and better format it for demo.
+#
 # This file is where I fetch security vulnerability data from the internet
 # CVE stands for Common Vulnerabilities and Exposures - it's how security
 # researchers track bugs that hackers could exploit
@@ -326,5 +333,4 @@ class CVEFetcher:
 #   fetcher = CVEFetcher()
 #   cves = fetcher.get_ubiquiti_cves(3)
 
-
-#used claude to clean up the code and help me, as on re-launch of the app I could not get it to work
+###///###
